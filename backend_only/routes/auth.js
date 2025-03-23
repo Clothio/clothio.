@@ -52,23 +52,34 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// ✅ Get Profile for Logged-in Users
 router.get('/profile', async (req, res) => {
     try {
-        const { user } = req.cookies;
-
-        if (!user) {
-            return res.status(401).json({ message: "Not authenticated" });
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({ message: "No authorization header" });
         }
 
-        const currentUser = await User.findOne({ email: user.email });
+        const email = authHeader.split(' ')[1]; 
+        const currentUser = await User.findOne({ email });
+        
         if (!currentUser) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        res.status(200).json({ message: "User profile", profile: { username: currentUser.username, email: currentUser.email } });
+        res.status(200).json({ 
+            success: true,
+            profile: { 
+                username: currentUser.username, 
+                email: currentUser.email 
+            } 
+        });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+        console.error("Profile error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Server error", 
+            error: error.message 
+        });
     }
 });
 

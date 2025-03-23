@@ -12,8 +12,10 @@ const PORT = 3000;
 
 // CORS Configuration
 const corsOptions = {
-    origin: 'http://localhost:5173', // Allow only your frontend origin
-    credentials: true, // Allow cookies to be sent
+    origin: true, // Allow all origins
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions)); // Enable CORS with options

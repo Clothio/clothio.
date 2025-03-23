@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+/backend_only/node_modules/
+/front-end/project/node_modules/
+
+# Environment files
+.env
+/backend_only/.env
+/front-end/project/.env
+/front-end/project/.env.local
+/front-end/project/.env.development
+/front-end/project/.env.production
+
+# Build outputs
+/front-end/project/dist/
+/front-end/project/build/
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/backend_only/logs/
+/front-end/project/logs/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testing
+/front-end/project/coverage/
+/backend_only/coverage/
+
+# Misc
+.DS_Store
+*.pem
+.cache/
+.temp/
+
+# TypeScript
+*.tsbuildinfo
+/front-end/project/tsconfig.tsbuildinfo
+
+# Vite
+/front-end/project/.vite/
