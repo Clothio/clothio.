@@ -1,5 +1,7 @@
+import { ShoppingCart } from 'lucide-react';
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useCart } from '../components/cartContext';
 
 // Mock product data
 const products = {
@@ -37,43 +39,56 @@ const products = {
 
 // Category titles mapping
 const categoryTitles: Record<string, string> = {
-  'ethnic': 'Ethnic Wear',
-  'western': 'Western Wear',
-  'party-wear': 'Party Wear',
-  'coat-sets': 'Coat Sets',
-  'semi-party': 'Semi-Party Wear',
-  'casual': 'Casual Wear',
+  "ethnic": "Ethnic Wear",
+  "western": "Western Wear",
+  "party-wear": "Party Wear",
+  "coat-sets": "Coat Sets",
+  "semi-party": "Semi-Party Wear",
+  "casual": "Casual Wear",
 };
 
 const CategoryPage: React.FC = () => {
   const { categoryName } = useParams<{ categoryName: string }>();
+  const { addToCart, cart } = useCart(); // Get addToCart function and cart from context
   const categoryProducts = categoryName ? products[categoryName as keyof typeof products] || [] : [];
-  const title = categoryName ? categoryTitles[categoryName] || categoryName : '';
+  const title = categoryName ? categoryTitles[categoryName] || categoryName : "";
 
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-3xl font-bold mb-8 capitalize">{title}</h1>
-      
+
       {categoryProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {categoryProducts.map((product) => (
-            <div key={product.id} className="group">
-              <div className="relative overflow-hidden rounded-lg mb-3 aspect-[3/4]">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <button className="bg-white text-gray-900 px-4 py-2 rounded-md font-medium hover:bg-gray-100 transition duration-300">
-                    Quick View
-                  </button>
+          {categoryProducts.map((product) => {
+            const isInCart = cart.some((cartItem) => cartItem.id === product.id); // Check if product is in the cart
+
+            return (
+              <div key={product.id} className="group">
+                <div className="relative overflow-hidden rounded-lg mb-3 aspect-[3/4]">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <button
+                      onClick={() => addToCart(product)} // Add product to cart on click
+                      className={`px-4 py-2 rounded-md font-medium transition duration-300 items-center flex flex-row gap-2 ${
+                        isInCart
+                          ? 'bg-blue-500 text-white hover:bg-blue-600' // Style for products in the cart
+                          : 'bg-white text-gray-900 hover:bg-gray-100' // Default style
+                      }`}
+                    >
+                      <ShoppingCart />
+                      {isInCart ? 'In Cart' : 'Add'}
+                    </button>
+                  </div>
                 </div>
+                <h3 className="font-medium text-gray-900">{product.name}</h3>
+                <p className="text-gray-700">${product.price.toFixed(2)}</p>
               </div>
-              <h3 className="font-medium text-gray-900">{product.name}</h3>
-              <p className="text-gray-700">${product.price.toFixed(2)}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow p-8 text-center">
