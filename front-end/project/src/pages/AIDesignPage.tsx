@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Wand2 } from 'lucide-react';
 
+const STABILITY_API_KEY = 'sk-ZgDF7cb6XHGRUuxzGKU1ALPifWevKtnqmVO4wO1YNHhJn9v1';
+const STABILITY_API_URL = 'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image';
+
 const AIDesignPage: React.FC = () => {
   const [designOptions, setDesignOptions] = useState({
     occasion: '',
@@ -20,15 +23,48 @@ const AIDesignPage: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const generatePrompt = (options: typeof designOptions) => {
+    return `A beautiful ${options.style} ${options.color} dress made of ${options.fabric} suitable for ${options.occasion} occasions, fashion photography style, detailed fabric texture, professional lighting`;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
-    
-    // Simulate AI generation
-    setTimeout(() => {
+
+    try {
+      const response = await fetch(STABILITY_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${STABILITY_API_KEY}`,
+        },
+        body: JSON.stringify({
+          text_prompts: [
+            {
+              text: generatePrompt(designOptions),
+              weight: 1,
+            },
+          ],
+          cfg_scale: 7,
+          steps: 30,
+          width: 1024,
+          height: 1024,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate image');
+      }
+
+      const data = await response.json();
+      const generatedImageBase64 = data.artifacts[0].base64;
+      setGeneratedDesign(`data:image/png;base64,${generatedImageBase64}`);
+    } catch (error) {
+      console.error('Error generating image:', error);
+      alert('Failed to generate image. Please try again.');
+    } finally {
       setIsGenerating(false);
-      setGeneratedDesign('https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1983&q=80');
-    }, 2000);
+    }
   };
 
   return (
